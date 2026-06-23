@@ -187,18 +187,20 @@
 	function getShadedBandPath(lowKey: string, highKey: string) {
 		if (filteredWHODataset.length === 0) return '';
 		const pointsLow = filteredWHODataset.map((e: any) => ({
-			x: projectX(e.x),
-			y: projectY(e[lowKey])
+			x: projectX(e.x) as number,
+			y: projectY(e[lowKey]) as number
 		}));
 		const pointsHigh = filteredWHODataset.map((e: any) => ({
-			x: projectX(e.x),
-			y: projectY(e[highKey])
+			x: projectX(e.x) as number,
+			y: projectY(e[highKey]) as number
 		}));
 
-		const forward = pointsLow.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+		const forward = pointsLow
+			.map((p: { x: number; y: number }) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+			.join(' ');
 		const backward = [...pointsHigh]
 			.reverse()
-			.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+			.map((p: { x: number; y: number }) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
 			.join(' ');
 
 		return `M ${forward} L ${backward} Z`;
@@ -334,18 +336,20 @@
 				textAccent: 'text-blue-600',
 				bgAccent: 'bg-blue-600 hover:bg-blue-700',
 				borderAccent: 'border-blue-200',
-				badge: 'bg-blue-50 text-blue-750 border border-blue-200',
+				badge: 'bg-blue-50 text-blue-800 border border-blue-200',
 				mainCurve: 'stroke-blue-600',
-				colorHex: '#2563eb'
+				colorHex: '#2563eb',
+				focusRing: 'focus:ring-blue-500 focus:border-blue-500'
 			};
 		} else {
 			return {
 				textAccent: 'text-pink-600',
 				bgAccent: 'bg-pink-600 hover:bg-pink-700',
 				borderAccent: 'border-pink-200',
-				badge: 'bg-pink-50 text-pink-750 border border-pink-200',
+				badge: 'bg-pink-50 text-pink-800 border border-pink-200',
 				mainCurve: 'stroke-pink-600',
-				colorHex: '#db2777'
+				colorHex: '#db2777',
+				focusRing: 'focus:ring-pink-500 focus:border-pink-500'
 			};
 		}
 	});
@@ -391,6 +395,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Tillväxtkurva</title>
+</svelte:head>
+
 <div
 	class="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-500/20 selection:text-slate-900"
 >
@@ -406,13 +414,13 @@
 			<!-- Settings: Gender and Age Unit Toggle -->
 			<div class="flex flex-wrap items-center gap-3">
 				<!-- Gender Select -->
-				<div class="flex bg-slate-100 border border-slate-200 rounded-lg p-1 gap-1 items-center">
+				<div class="flex bg-slate-100 border border-slate-300 rounded-lg p-1 gap-1 items-center">
 					<button
 						onclick={() => appState.setGender('boy')}
 						class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {appState.gender ===
 						'boy'
 							? 'bg-blue-600 text-white shadow-sm'
-							: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+							: 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/60'}"
 					>
 						Pojke
 					</button>
@@ -421,14 +429,14 @@
 						class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {appState.gender ===
 						'girl'
 							? 'bg-pink-600 text-white shadow-sm'
-							: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+							: 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/60'}"
 					>
 						Flicka
 					</button>
 				</div>
 
 				<!-- Age Unit Select -->
-				<div class="flex bg-slate-100 border border-slate-200 rounded-lg p-1 gap-1 items-center">
+				<div class="flex bg-slate-100 border border-slate-300 rounded-lg p-1 gap-1 items-center">
 					<button
 						onclick={() => {
 							appState.setAgeUnit('weeks');
@@ -436,8 +444,8 @@
 						}}
 						class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {appState.ageUnit ===
 						'weeks'
-							? 'bg-white text-slate-850 border border-slate-200 shadow-sm'
-							: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+							? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+							: 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/60'}"
 						disabled={activeTab === 'wfl'}
 						class:opacity-50={activeTab === 'wfl'}
 						title={activeTab === 'wfl' ? 'Vikt-för-längd använder inte åldersenhet' : ''}
@@ -451,8 +459,8 @@
 						}}
 						class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {appState.ageUnit ===
 						'months'
-							? 'bg-white text-slate-850 border border-slate-200 shadow-sm'
-							: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+							? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+							: 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/60'}"
 						disabled={activeTab === 'wfl'}
 						class:opacity-50={activeTab === 'wfl'}
 						title={activeTab === 'wfl' ? 'Vikt-för-längd använder inte åldersenhet' : ''}
@@ -468,7 +476,7 @@
 			<!-- LEFT COLUMN: Forms, Logs, Data Settings (5 cols) -->
 			<div class="lg:col-span-5 flex flex-col gap-8">
 				<!-- INPUT FORM CARD -->
-				<div class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+				<div class="bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
 					<h2 class="text-lg font-bold text-slate-900 mb-4">Logga mätning</h2>
 
 					<form
@@ -483,7 +491,7 @@
 							<div>
 								<label
 									for="age-input"
-									class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"
+									class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider"
 								>
 									{appState.ageUnit === 'weeks' ? 'Ålder (veckor)' : 'Ålder (månader)'}
 									<span class="text-red-500">*</span>
@@ -495,7 +503,7 @@
 										step="any"
 										bind:value={inputAge}
 										placeholder={appState.ageUnit === 'weeks' ? 't.ex. 6' : 't.ex. 3'}
-										class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all text-sm"
+										class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 {genderTheme.focusRing} transition-all text-sm"
 										required
 									/>
 								</div>
@@ -505,7 +513,7 @@
 							<div>
 								<label
 									for="weight-input"
-									class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"
+									class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider"
 								>
 									Vikt (kg)
 								</label>
@@ -515,7 +523,7 @@
 									step="any"
 									bind:value={inputWeight}
 									placeholder="t.ex. 5.6"
-									class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all text-sm"
+									class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 {genderTheme.focusRing} transition-all text-sm"
 								/>
 							</div>
 						</div>
@@ -525,7 +533,7 @@
 							<div>
 								<label
 									for="length-input"
-									class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"
+									class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider"
 								>
 									Längd (cm)
 								</label>
@@ -535,7 +543,7 @@
 									step="any"
 									bind:value={inputLength}
 									placeholder="t.ex. 58"
-									class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all text-sm"
+									class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 {genderTheme.focusRing} transition-all text-sm"
 								/>
 							</div>
 
@@ -543,7 +551,7 @@
 							<div>
 								<label
 									for="hc-input"
-									class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider"
+									class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider"
 								>
 									Huvudomfång (cm)
 								</label>
@@ -553,7 +561,7 @@
 									step="any"
 									bind:value={inputHC}
 									placeholder="t.ex. 39.5"
-									class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all text-sm"
+									class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 {genderTheme.focusRing} transition-all text-sm"
 								/>
 							</div>
 						</div>
@@ -577,7 +585,7 @@
 
 				<!-- MEASUREMENTS LIST / TABLE -->
 				<div
-					class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm flex flex-col max-h-[450px]"
+					class="bg-white border border-slate-300 rounded-lg p-6 shadow-sm flex flex-col max-h-[450px]"
 				>
 					<div class="flex justify-between items-center mb-4">
 						<h2 class="text-lg font-bold text-slate-900">Registrerade punkter</h2>
@@ -586,7 +594,7 @@
 								onclick={() => {
 									if (confirm('Vill du verkligen rensa all historik?')) appState.clearAll();
 								}}
-								class="text-xs text-slate-500 hover:text-red-650 font-medium px-2 py-1 rounded hover:bg-red-50 border border-transparent hover:border-red-200 transition-all cursor-pointer"
+								class="text-xs text-slate-600 hover:text-red-750 font-bold px-2 py-1 rounded hover:bg-red-50 border border-transparent hover:border-red-300 transition-all cursor-pointer"
 							>
 								Rensa allt
 							</button>
@@ -595,16 +603,16 @@
 
 					{#if appState.measurements.length === 0}
 						<div
-							class="text-center py-12 border border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center"
+							class="text-center py-12 border border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center"
 						>
-							<p class="text-slate-400 text-sm px-4">Inga mätningar registrerade.</p>
+							<p class="text-slate-600 text-sm px-4">Inga mätningar registrerade.</p>
 						</div>
 					{:else}
 						<div class="overflow-y-auto pr-1 flex-1">
 							<table class="w-full text-left border-collapse">
 								<thead>
 									<tr
-										class="border-b border-slate-200 text-slate-450 text-[10px] font-semibold uppercase tracking-wider"
+										class="border-b border-slate-300 text-slate-600 text-[10px] font-semibold uppercase tracking-wider"
 									>
 										<th class="pb-2 font-semibold">Ålder</th>
 										<th class="pb-2 font-semibold">Vikt</th>
@@ -613,7 +621,7 @@
 										<th class="pb-2 font-semibold text-right"></th>
 									</tr>
 								</thead>
-								<tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+								<tbody class="divide-y divide-slate-200 text-sm text-slate-700">
 									{#each appState.measurements as m (m.id)}
 										<tr class="hover:bg-slate-50 transition-colors group">
 											<td class="py-2.5 font-semibold text-slate-900">
@@ -632,7 +640,7 @@
 											<td class="py-2.5 text-right">
 												<button
 													onclick={() => handleDelete(m.id)}
-													class="p-1 text-slate-400 hover:text-red-650 hover:bg-red-50 rounded transition-all cursor-pointer opacity-80 group-hover:opacity-100"
+													class="p-1 text-slate-500 hover:text-red-700 hover:bg-red-50 rounded transition-all cursor-pointer group-hover:opacity-100"
 													title="Ta bort mätning"
 												>
 													<svg
@@ -663,21 +671,21 @@
 			<!-- RIGHT COLUMN: Chart, Tab Controls (7 cols) -->
 			<div class="lg:col-span-7 flex flex-col gap-8">
 				<!-- CHART CONTAINER CARD -->
-				<div class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+				<div class="bg-white border border-slate-300 rounded-lg p-6 shadow-sm">
 					<!-- Chart Metric Tabs & Range selection -->
 					<div
 						class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"
 					>
 						<!-- Metric Select -->
 						<div
-							class="flex bg-slate-100 border border-slate-200 rounded-lg p-1 gap-1 items-center"
+							class="flex bg-slate-100 border border-slate-300 rounded-lg p-1 gap-1 items-center"
 						>
 							<button
 								onclick={() => (activeTab = 'wfa')}
 								class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {activeTab ===
 								'wfa'
-									? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-									: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+									? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+									: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 							>
 								Vikt
 							</button>
@@ -685,8 +693,8 @@
 								onclick={() => (activeTab = 'lhfa')}
 								class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {activeTab ===
 								'lhfa'
-									? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-									: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+									? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+									: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 							>
 								Längd
 							</button>
@@ -694,8 +702,8 @@
 								onclick={() => (activeTab = 'hcfa')}
 								class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {activeTab ===
 								'hcfa'
-									? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-									: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+									? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+									: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 							>
 								Huvudomfång
 							</button>
@@ -703,8 +711,8 @@
 								onclick={() => (activeTab = 'wfl')}
 								class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {activeTab ===
 								'wfl'
-									? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-									: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+									? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+									: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 							>
 								Vikt-för-längd
 							</button>
@@ -713,14 +721,14 @@
 						<!-- View Range Toggle for Months -->
 						{#if appState.ageUnit === 'months' && activeTab !== 'wfl'}
 							<div
-								class="flex bg-slate-100 border border-slate-200 rounded-lg p-1 gap-1 items-center"
+								class="flex bg-slate-100 border border-slate-300 rounded-lg p-1 gap-1 items-center"
 							>
 								<button
 									onclick={() => (selectedRange = '1yr')}
 									class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {selectedRange ===
 									'1yr'
-										? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-										: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+										? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+										: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 								>
 									1 år
 								</button>
@@ -728,8 +736,8 @@
 									onclick={() => (selectedRange = '2yr')}
 									class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {selectedRange ===
 									'2yr'
-										? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-										: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+										? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+										: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 								>
 									2 år
 								</button>
@@ -737,8 +745,8 @@
 									onclick={() => (selectedRange = '5yr')}
 									class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 cursor-pointer {selectedRange ===
 									'5yr'
-										? 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-										: 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}"
+										? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+										: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 								>
 									5 år
 								</button>
@@ -748,10 +756,10 @@
 
 					<!-- SVG Chart Area -->
 					<div
-						class="relative bg-white rounded-lg p-2 border border-slate-200 overflow-hidden select-none"
+						class="relative bg-white rounded-lg p-2 border border-slate-300 overflow-hidden select-none"
 					>
 						{#if filteredWHODataset.length === 0}
-							<div class="w-full h-[400px] flex items-center justify-center text-slate-400">
+							<div class="w-full h-[400px] flex items-center justify-center text-slate-600">
 								Laddar kurvdata...
 							</div>
 						{:else}
@@ -772,7 +780,7 @@
 										<text
 											x={xCoord}
 											y={svgH - padB + 20}
-											class="fill-slate-500 text-[10px] text-center font-medium"
+											class="fill-slate-600 text-[10px] text-center font-medium"
 											text-anchor="middle"
 										>
 											{tick}
@@ -793,7 +801,7 @@
 										<text
 											x={padL - 10}
 											y={yCoord + 3}
-											class="fill-slate-500 text-[10px]"
+											class="fill-slate-600 text-[10px]"
 											text-anchor="end"
 										>
 											{tick}
@@ -820,7 +828,7 @@
 								<path
 									d={getCurvePath('sd3')}
 									fill="none"
-									class="stroke-red-500"
+									class="stroke-red-600"
 									stroke-width="1"
 									stroke-dasharray="3,3"
 								/>
@@ -828,14 +836,14 @@
 								<path
 									d={getCurvePath('sd2')}
 									fill="none"
-									class="stroke-orange-500"
+									class="stroke-orange-600"
 									stroke-width="1.2"
 								/>
 								<!-- +1 SD -->
 								<path
 									d={getCurvePath('sd1')}
 									fill="none"
-									class="stroke-emerald-500"
+									class="stroke-emerald-600"
 									stroke-width="1"
 									stroke-dasharray="4,4"
 								/>
@@ -844,7 +852,7 @@
 								<path
 									d={getCurvePath('sd0')}
 									fill="none"
-									class="stroke-emerald-600"
+									class="stroke-emerald-700"
 									stroke-width="2"
 								/>
 
@@ -852,7 +860,7 @@
 								<path
 									d={getCurvePath('sd1neg')}
 									fill="none"
-									class="stroke-emerald-500"
+									class="stroke-emerald-600"
 									stroke-width="1"
 									stroke-dasharray="4,4"
 								/>
@@ -860,14 +868,14 @@
 								<path
 									d={getCurvePath('sd2neg')}
 									fill="none"
-									class="stroke-orange-500"
+									class="stroke-orange-600"
 									stroke-width="1.2"
 								/>
 								<!-- -3 SD -->
 								<path
 									d={getCurvePath('sd3neg')}
 									fill="none"
-									class="stroke-red-500"
+									class="stroke-red-600"
 									stroke-width="1"
 									stroke-dasharray="3,3"
 								/>
@@ -878,43 +886,43 @@
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd3) + 3}
-										class="fill-red-500 text-[8px] font-bold"
+										class="fill-red-700 text-[8px] font-bold"
 										text-anchor="start">+3 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd2) + 3}
-										class="fill-orange-500 text-[8px] font-bold"
+										class="fill-orange-700 text-[8px] font-bold"
 										text-anchor="start">+2 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd1) + 3}
-										class="fill-emerald-500 text-[8px] font-bold"
+										class="fill-emerald-700 text-[8px] font-bold"
 										text-anchor="start">+1 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd0) + 3}
-										class="fill-emerald-600 text-[8px] font-bold"
+										class="fill-emerald-800 text-[8px] font-bold"
 										text-anchor="start">Median</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd1neg) + 3}
-										class="fill-emerald-500 text-[8px] font-bold"
+										class="fill-emerald-700 text-[8px] font-bold"
 										text-anchor="start">-1 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd2neg) + 3}
-										class="fill-orange-500 text-[8px] font-bold"
+										class="fill-orange-700 text-[8px] font-bold"
 										text-anchor="start">-2 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd3neg) + 3}
-										class="fill-red-500 text-[8px] font-bold"
+										class="fill-red-700 text-[8px] font-bold"
 										text-anchor="start">-3 SD</text
 									>
 								{/if}
@@ -987,7 +995,7 @@
 								<text
 									x={15}
 									y={svgH / 2}
-									class="fill-slate-500 text-xs font-semibold uppercase tracking-wider"
+									class="fill-slate-600 text-xs font-semibold uppercase tracking-wider"
 									transform="rotate(-90 15 {svgH / 2})"
 									text-anchor="middle"
 								>
@@ -998,7 +1006,7 @@
 								<text
 									x={svgW / 2}
 									y={svgH - 12}
-									class="fill-slate-500 text-xs font-semibold uppercase tracking-wider"
+									class="fill-slate-600 text-xs font-semibold uppercase tracking-wider"
 									text-anchor="middle"
 								>
 									{getXLabel()}
@@ -1012,10 +1020,10 @@
 							{@const yCoord = projectY(hoveredPoint.val)}
 							<div
 								class="absolute z-20 bg-slate-900 text-xs text-white p-3 rounded shadow-md border border-slate-700 pointer-events-none"
-								style="left: {Math.min(svgW - 150, Math.max(10, xCoord - 70))}px; top: {Math.max(
+								style="left: {Math.min(svgW - 180, Math.max(10, xCoord - 90))}px; top: {Math.max(
 									10,
 									yCoord - 100
-								)}px; min-width: 145px;"
+								)}px; min-width: 180px;"
 							>
 								<div class="font-bold border-b border-slate-700 pb-1 flex justify-between">
 									<span>Mätpunkt</span>
@@ -1025,25 +1033,25 @@
 									</span>
 								</div>
 								<div class="flex justify-between gap-4 mt-1">
-									<span class="text-slate-350">Värde:</span>
+									<span class="text-slate-400">Värde:</span>
 									<span class="font-semibold"
 										>{hoveredPoint.val.toFixed(1)}
 										{activeTab === 'wfa' || activeTab === 'wfl' ? 'kg' : 'cm'}</span
 									>
 								</div>
 								<div class="flex justify-between gap-4">
-									<span class="text-slate-355">Z-score:</span>
+									<span class="text-slate-400">Standardavvikelse (SD):</span>
 									<span class="font-semibold">{formatZ(hoveredPoint.z)}</span>
 								</div>
 								<div class="flex justify-between gap-4">
-									<span class="text-slate-355">Percentil:</span>
+									<span class="text-slate-400">Percentil:</span>
 									<span class="font-semibold">{hoveredPoint.pct.toFixed(1)}%</span>
 								</div>
 							</div>
 						{/if}
 					</div>
 					{#if activeTab === 'lhfa' && appState.ageUnit === 'months'}
-						<p class="mt-3 text-[11px] text-slate-500 leading-relaxed">
+						<p class="mt-3 text-[11px] text-slate-600 leading-relaxed">
 							* Övergången vid 24 månader reflekterar WHO:s standard där liggande längd (recumbent
 							length) mäts upp till 2 år, och stående längd (stature, vilket i genomsnitt är 0,7 cm
 							kortare) mäts därefter.
@@ -1054,13 +1062,19 @@
 		</div>
 
 		<!-- FOOTER -->
-		<footer class="mt-12 border-t border-slate-205 pt-6 text-center text-xs text-slate-400">
-			Datakälla: <a
-				href="https://www.who.int/tools/child-growth-standards/standards"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="underline hover:text-slate-600">WHO Child Growth Standards</a
-			>
+		<footer
+			class="mt-12 border-t border-slate-300 pt-6 text-center text-xs text-slate-500 max-w-2xl mx-auto space-y-2"
+		>
+			<p>
+				<strong>Datakälla:</strong>
+				<a
+					href="https://www.who.int/tools/child-growth-standards/standards"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="underline hover:text-slate-800">WHO Child Growth Standards</a
+				>. Referensdata baseras på WHO:s globala multicenterstudie (MGRS) av friska, ammade barn
+				under optimala förhållanden.
+			</p>
 		</footer>
 	</div>
 </div>
