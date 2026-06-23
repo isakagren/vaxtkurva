@@ -151,7 +151,7 @@
 				const inRange = x >= xRange.min && x <= xRange.max;
 				return { id: m.id, raw: m, x, y, inRange };
 			})
-			.filter((p) => p.y !== null && p.x > 0);
+			.filter((p) => p.y !== null && (activeTab === 'wfl' ? p.x > 0 : p.x >= 0));
 	});
 
 	// SVG parameters
@@ -244,7 +244,7 @@
 		const xVal =
 			metric === 'wfl' ? m.length || 0 : appState.ageUnit === 'weeks' ? m.ageWeeks : m.ageMonths;
 
-		if (rawVal === null || xVal <= 0) return null;
+		if (rawVal === null || (metric === 'wfl' ? xVal <= 0 : xVal < 0)) return null;
 
 		const genderData = appState.gender === 'boy' ? boysData[metric] : girlsData[metric];
 		if (!genderData) return null;
@@ -280,8 +280,8 @@
 	// Handle adding measurement from form
 	function handleAdd() {
 		formError = '';
-		if (inputAge === null || inputAge <= 0) {
-			formError = 'Ålder måste vara ett positivt tal.';
+		if (inputAge === null || inputAge < 0) {
+			formError = 'Ange en giltig ålder (0 eller högre).';
 			return;
 		}
 
@@ -448,7 +448,7 @@
 							: 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/60'}"
 						disabled={activeTab === 'wfl'}
 						class:opacity-50={activeTab === 'wfl'}
-						title={activeTab === 'wfl' ? 'Vikt-för-längd använder inte åldersenhet' : ''}
+						title={activeTab === 'wfl' ? 'Vikt-mot-längd använder inte åldersenhet' : ''}
 					>
 						Veckor
 					</button>
@@ -463,7 +463,7 @@
 							: 'text-slate-700 hover:text-slate-950 hover:bg-slate-200/60'}"
 						disabled={activeTab === 'wfl'}
 						class:opacity-50={activeTab === 'wfl'}
-						title={activeTab === 'wfl' ? 'Vikt-för-längd använder inte åldersenhet' : ''}
+						title={activeTab === 'wfl' ? 'Vikt-mot-längd använder inte åldersenhet' : ''}
 					>
 						Månader
 					</button>
@@ -714,7 +714,7 @@
 									? 'bg-white text-slate-900 border border-slate-300 shadow-sm'
 									: 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/60'}"
 							>
-								Vikt-för-längd
+								Vikt-mot-längd
 							</button>
 						</div>
 
@@ -886,43 +886,43 @@
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd3) + 3}
-										class="fill-red-700 text-[8px] font-bold"
+										class="fill-red-700 text-[10px] font-bold"
 										text-anchor="start">+3 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd2) + 3}
-										class="fill-orange-700 text-[8px] font-bold"
+										class="fill-orange-700 text-[10px] font-bold"
 										text-anchor="start">+2 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd1) + 3}
-										class="fill-emerald-700 text-[8px] font-bold"
+										class="fill-emerald-700 text-[10px] font-bold"
 										text-anchor="start">+1 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd0) + 3}
-										class="fill-emerald-800 text-[8px] font-bold"
+										class="fill-emerald-800 text-[10px] font-bold"
 										text-anchor="start">Median</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd1neg) + 3}
-										class="fill-emerald-700 text-[8px] font-bold"
+										class="fill-emerald-700 text-[10px] font-bold"
 										text-anchor="start">-1 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd2neg) + 3}
-										class="fill-orange-700 text-[8px] font-bold"
+										class="fill-orange-700 text-[10px] font-bold"
 										text-anchor="start">-2 SD</text
 									>
 									<text
 										x={svgW - padR + 6}
 										y={projectY(last.sd3neg) + 3}
-										class="fill-red-700 text-[8px] font-bold"
+										class="fill-red-700 text-[10px] font-bold"
 										text-anchor="start">-3 SD</text
 									>
 								{/if}
@@ -1019,7 +1019,7 @@
 							{@const xCoord = projectX(hoveredPoint.age)}
 							{@const yCoord = projectY(hoveredPoint.val)}
 							<div
-								class="absolute z-20 bg-slate-900 text-xs text-white p-3 rounded shadow-md border border-slate-700 pointer-events-none"
+								class="absolute z-20 bg-slate-50 text-xs text-black p-3 rounded shadow-md border border-slate-700 pointer-events-none"
 								style="left: {Math.min(svgW - 180, Math.max(10, xCoord - 90))}px; top: {Math.max(
 									10,
 									yCoord - 100
@@ -1033,18 +1033,18 @@
 									</span>
 								</div>
 								<div class="flex justify-between gap-4 mt-1">
-									<span class="text-slate-400">Värde:</span>
+									<span class="text-slate-700">Värde:</span>
 									<span class="font-semibold"
 										>{hoveredPoint.val.toFixed(1)}
 										{activeTab === 'wfa' || activeTab === 'wfl' ? 'kg' : 'cm'}</span
 									>
 								</div>
 								<div class="flex justify-between gap-4">
-									<span class="text-slate-400">Standardavvikelse (SD):</span>
+									<span class="text-slate-700">Standardavvikelse (SD):</span>
 									<span class="font-semibold">{formatZ(hoveredPoint.z)}</span>
 								</div>
 								<div class="flex justify-between gap-4">
-									<span class="text-slate-400">Percentil:</span>
+									<span class="text-slate-700">Percentil:</span>
 									<span class="font-semibold">{hoveredPoint.pct.toFixed(1)}%</span>
 								</div>
 							</div>
